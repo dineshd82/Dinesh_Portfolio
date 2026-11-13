@@ -2034,31 +2034,44 @@ export class HeroScene {
       this.layout.baseY = -0.26;
       this.layout.scale = 0.38;
     } else {
-      // Mobile (< 768px): Anchored cleanly below hero typography in lower half
-      let mobileScale = 0.50;
-      let mobileY = -0.62;
-      let mobileX = -0.08;
-
-      if (width < 380) {
-        // Very small mobile screens (e.g. iPhone SE / 360px width Android)
-        mobileScale = height < 700 ? 0.44 : 0.46;
-        mobileY = height < 700 ? -0.70 : -0.64;
-        mobileX = -0.06;
-      } else if (width < 480) {
-        // Standard mobile screens (e.g. 390px - 430px modern smartphones)
-        mobileScale = height < 750 ? 0.48 : 0.50;
-        mobileY = height < 750 ? -0.64 : -0.60;
-        mobileX = -0.08;
+      // Mobile (< 768px): Anchored cleanly below hero typography in lower half with guaranteed clearance
+      if (aspect > 1.2 && height < 550) {
+        // Mobile Landscape: side-by-side layout (3D on right, text on left)
+        this.layout.baseX = 0.62;
+        this.layout.baseY = -0.16;
+        this.layout.scale = 0.36;
       } else {
-        // Large mobile screens / phablet (480px - 767px)
-        mobileScale = 0.54;
-        mobileY = -0.56;
-        mobileX = -0.08;
-      }
+        // Mobile Portrait: 3D scene comfortably anchored in lower half, guaranteed clearance below typography
+        let mobileScale = 0.38;
+        let mobileY = -0.86;
+        let mobileX = -0.08;
 
-      this.layout.baseX = mobileX;
-      this.layout.baseY = mobileY;
-      this.layout.scale = mobileScale;
+        if (height < 700) {
+          // Compact / shorter screens (e.g. iPhone SE / older Android devices)
+          mobileScale = 0.34;
+          mobileY = -0.92;
+          mobileX = -0.06;
+        } else if (height < 800) {
+          // Mid-height phones (e.g. 360x740, 390x780)
+          mobileScale = 0.37;
+          mobileY = -0.88;
+          mobileX = -0.08;
+        } else if (height < 880) {
+          // Standard modern smartphones (e.g. iPhone 13/14/15, 390x844, Galaxy 392x824)
+          mobileScale = 0.40;
+          mobileY = -0.84;
+          mobileX = -0.08;
+        } else {
+          // Tall phones & phablets (e.g. Pixel 7/8 915px, iPhone Pro Max 932px)
+          mobileScale = 0.42;
+          mobileY = -0.80;
+          mobileX = -0.08;
+        }
+
+        this.layout.baseX = mobileX;
+        this.layout.baseY = mobileY;
+        this.layout.scale = mobileScale;
+      }
     }
 
     this.rootGroup.scale.setScalar(this.layout.scale);
@@ -2068,8 +2081,8 @@ export class HeroScene {
     if (this.floatingCards && this.floatingCards.length > 0) {
       this.floatingCards.forEach((card, idx) => {
         if (width < 768) {
-          // On mobile, show only top 2 cards to prevent crowding
-          card.mesh.visible = idx < 2;
+          // On mobile, show top 2 cards when height allows, or hide on very compact screens to avoid clutter
+          card.mesh.visible = height >= 680 ? idx < 2 : false;
         } else {
           card.mesh.visible = true;
         }
