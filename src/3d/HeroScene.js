@@ -56,6 +56,15 @@ class FigmaScreenRenderer {
       clicking: false,
       pulse: 0
     };
+
+    // Cached Dot Grid Pattern Canvas for high-performance single-pass fill
+    this.dotPatternCanvas = document.createElement('canvas');
+    this.dotPatternCanvas.width = 22;
+    this.dotPatternCanvas.height = 22;
+    const pctx = this.dotPatternCanvas.getContext('2d');
+    pctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    pctx.fillRect(0, 0, 1.5, 1.5);
+    this.dotPattern = this.ctx.createPattern(this.dotPatternCanvas, 'repeat');
   }
 
   handleWheel(deltaY) {
@@ -145,14 +154,13 @@ class FigmaScreenRenderer {
     const vpW = W - 180 - 180;
     const vpH = H - 38;
 
-    // Dot Grid with Scroll Parallax
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-    const dotSpacing = 22;
-    const gridOffsetY = -Math.round(this.scrollY % dotSpacing);
-    for (let x = vpX; x < vpX + vpW; x += dotSpacing) {
-      for (let y = vpY + gridOffsetY; y < H; y += dotSpacing) {
-        if (y >= vpY) ctx.fillRect(x, y, 1.5, 1.5);
-      }
+    // Dot Grid with Scroll Parallax (High-performance single pattern fill)
+    if (this.dotPattern) {
+      ctx.save();
+      ctx.fillStyle = this.dotPattern;
+      ctx.translate(0, -Math.round(this.scrollY % 22));
+      ctx.fillRect(vpX, vpY, vpW, vpH + 22);
+      ctx.restore();
     }
 
     // Clip to Viewport and translate by scroll
@@ -1217,6 +1225,13 @@ export class HeroScene {
     this.handlers = {};
     this.resizeObserver = null;
     this.intersectionObserver = null;
+
+    // Performance optimization caches
+    this.heroHeight = this.heroSection ? (this.heroSection.offsetHeight || window.innerHeight) : window.innerHeight;
+    this.isScrolling = false;
+    this.scrollTimeout = null;
+    this._colorA = new THREE.Color();
+    this._colorB = new THREE.Color();
   }
 
   init() {
@@ -2019,13 +2034,35 @@ export class HeroScene {
       this.layout.baseY = -0.26;
       this.layout.scale = 0.38;
     } else {
-      // Mobile (< 768px): Anchored cleanly below hero typography in lower third
-      this.layout.baseX = 0.0;
-      this.layout.baseY = -1.18;
-      this.layout.scale = 0.33;
+      // Mobile (< 768px): Anchored cleanly below hero typography in lower half
+      let mobileScale = 0.50;
+      let mobileY = -0.62;
+      let mobileX = -0.08;
+
+      if (width < 380) {
+        // Very small mobile screens (e.g. iPhone SE / 360px width Android)
+        mobileScale = height < 700 ? 0.44 : 0.46;
+        mobileY = height < 700 ? -0.70 : -0.64;
+        mobileX = -0.06;
+      } else if (width < 480) {
+        // Standard mobile screens (e.g. 390px - 430px modern smartphones)
+        mobileScale = height < 750 ? 0.48 : 0.50;
+        mobileY = height < 750 ? -0.64 : -0.60;
+        mobileX = -0.08;
+      } else {
+        // Large mobile screens / phablet (480px - 767px)
+        mobileScale = 0.54;
+        mobileY = -0.56;
+        mobileX = -0.08;
+      }
+
+      this.layout.baseX = mobileX;
+      this.layout.baseY = mobileY;
+      this.layout.scale = mobileScale;
     }
 
     this.rootGroup.scale.setScalar(this.layout.scale);
+    this.rootGroup.position.set(this.layout.baseX, this.layout.baseY, this.layout.baseZ);
 
     // Responsive floating cards visibility
     if (this.floatingCards && this.floatingCards.length > 0) {
@@ -2042,16 +2079,14 @@ export class HeroScene {
 
   setupListeners() {
     this.handlers.onMouseMove = (e) => {
-      if (this.isReducedMotion || !this.heroSection) return;
-      const rect = this.heroSection.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      if (this.isReducedMotion || !this.heroSection || !this.isVisible) return;
 
       const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : null);
       const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : null);
 
       if (clientX !== null && clientY !== null) {
-        this.mouse.targetX = ((clientX - rect.left) / rect.width - 0.5) * 2;
-        this.mouse.targetY = ((clientY - rect.top) / rect.height - 0.5) * 2;
+        this.mouse.targetX = (clientX / window.innerWidth - 0.5) * 2;
+        this.mouse.targetY = (clientY / window.innerHeight - 0.5) * 2;
       }
     };
 
@@ -2067,9 +2102,7 @@ export class HeroScene {
 
     // Mouse Wheel interaction driving the Figma monitor screen
     this.handlers.onWheel = (e) => {
-      if (!this.heroSection || !this.figmaRenderer) return;
-      const rect = this.heroSection.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+      if (!this.heroSection || !this.figmaRenderer || !this.isVisible) return;
 
       const clientX = e.clientX;
       const clientY = e.clientY;
@@ -2105,10 +2138,20 @@ export class HeroScene {
 
     this.handlers.onScroll = () => {
       if (!this.heroSection) return;
-      const rect = this.heroSection.getBoundingClientRect();
-      const heroHeight = rect.height || window.innerHeight;
-      const progress = Math.max(0, Math.min(1, -rect.top / heroHeight));
+      const scrollY = (window.lenis && typeof window.lenis.scroll === 'number')
+        ? window.lenis.scroll
+        : (window.scrollY || window.pageYOffset || 0);
+
+      const heroH = this.heroHeight || window.innerHeight;
+      const progress = Math.max(0, Math.min(1, scrollY / heroH));
       this.scroll.targetProgress = progress;
+
+      // Mark active scroll to prioritize scroll rendering over monitor texture re-uploads
+      this.isScrolling = true;
+      if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
+      this.scrollTimeout = setTimeout(() => {
+        this.isScrolling = false;
+      }, 120);
 
       if (this.isReducedMotion) {
         this.scroll.progress = progress;
@@ -2181,6 +2224,8 @@ export class HeroScene {
   resize(width, height) {
     if (!this.camera || !this.renderer) return;
 
+    this.heroHeight = this.heroSection ? (this.heroSection.offsetHeight || window.innerHeight) : window.innerHeight;
+
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
 
@@ -2198,24 +2243,34 @@ export class HeroScene {
   start() {
     if (this.isReducedMotion) return;
     this.isVisible = true;
+    if (this.animId) return;
 
     const loop = () => {
-      this.animId = requestAnimationFrame(loop);
-      if (this.isVisible) {
-        this.update();
-        this.render();
+      if (!this.isVisible) {
+        this.animId = null;
+        return;
       }
+      this.animId = requestAnimationFrame(loop);
+      this.update();
+      this.render();
     };
     this.animId = requestAnimationFrame(loop);
   }
 
   pause() {
     this.isVisible = false;
+    if (this.animId) {
+      cancelAnimationFrame(this.animId);
+      this.animId = null;
+    }
   }
 
   resume() {
     if (this.isReducedMotion) return;
     this.isVisible = true;
+    if (!this.animId) {
+      this.start();
+    }
   }
 
   setTheme(themeName) {
@@ -2230,32 +2285,32 @@ export class HeroScene {
     const isDark = this.targetTheme === 'dark';
 
     // Ambient light
-    const ambStartCol = isDark ? new THREE.Color(0xfbf7f2) : new THREE.Color(0x151720);
-    const ambEndCol = isDark ? new THREE.Color(0x151720) : new THREE.Color(0xfbf7f2);
-    const ambStartInt = isDark ? 2.2 : 1.4;
-    const ambEndInt = isDark ? 1.4 : 2.2;
     if (this.ambientLight) {
-      this.ambientLight.color.copy(ambStartCol).lerp(ambEndCol, t);
+      this._colorA.setHex(isDark ? 0xfbf7f2 : 0x151720);
+      this._colorB.setHex(isDark ? 0x151720 : 0xfbf7f2);
+      this.ambientLight.color.copy(this._colorA).lerp(this._colorB, t);
+      const ambStartInt = isDark ? 2.2 : 1.4;
+      const ambEndInt = isDark ? 1.4 : 2.2;
       this.ambientLight.intensity = ambStartInt + (ambEndInt - ambStartInt) * t;
     }
 
     // Key light
-    const keyStartCol = isDark ? new THREE.Color(0xfff8ee) : new THREE.Color(0xffffff);
-    const keyEndCol = isDark ? new THREE.Color(0xffffff) : new THREE.Color(0xfff8ee);
-    const keyStartInt = isDark ? 2.5 : 2.2;
-    const keyEndInt = isDark ? 2.2 : 2.5;
     if (this.keyLight) {
-      this.keyLight.color.copy(keyStartCol).lerp(keyEndCol, t);
+      this._colorA.setHex(isDark ? 0xfff8ee : 0xffffff);
+      this._colorB.setHex(isDark ? 0xffffff : 0xfff8ee);
+      this.keyLight.color.copy(this._colorA).lerp(this._colorB, t);
+      const keyStartInt = isDark ? 2.5 : 2.2;
+      const keyEndInt = isDark ? 2.2 : 2.5;
       this.keyLight.intensity = keyStartInt + (keyEndInt - keyStartInt) * t;
     }
 
     // Fill light
-    const fillStartCol = isDark ? new THREE.Color(0xd8d4cc) : new THREE.Color(0x2d3446);
-    const fillEndCol = isDark ? new THREE.Color(0x2d3446) : new THREE.Color(0xd8d4cc);
-    const fillStartInt = isDark ? 1.2 : 0.7;
-    const fillEndInt = isDark ? 0.7 : 1.2;
     if (this.fillLight) {
-      this.fillLight.color.copy(fillStartCol).lerp(fillEndCol, t);
+      this._colorA.setHex(isDark ? 0xd8d4cc : 0x2d3446);
+      this._colorB.setHex(isDark ? 0x2d3446 : 0xd8d4cc);
+      this.fillLight.color.copy(this._colorA).lerp(this._colorB, t);
+      const fillStartInt = isDark ? 1.2 : 0.7;
+      const fillEndInt = isDark ? 0.7 : 1.2;
       this.fillLight.intensity = fillStartInt + (fillEndInt - fillStartInt) * t;
     }
 
@@ -2307,9 +2362,9 @@ export class HeroScene {
       this.interpolateTheme(this.themeProgress);
     }
 
-    // 1. Update Figma Canvas Texture (Throttled for peak WebGL 60fps performance)
-    if (this.figmaRenderer && this.figmaTexture) {
-      if (time - this.lastTextureUpdate > 0.033) {
+    // 1. Update Figma Canvas Texture (Paused during active scroll to eliminate GPU texImage2D pipeline stalls)
+    if (this.figmaRenderer && this.figmaTexture && !this.isScrolling) {
+      if (time - this.lastTextureUpdate > 0.048) {
         this.figmaRenderer.update(delta);
         this.figmaTexture.needsUpdate = true;
         this.lastTextureUpdate = time;
@@ -2384,6 +2439,11 @@ export class HeroScene {
     if (this.animId) {
       cancelAnimationFrame(this.animId);
       this.animId = null;
+    }
+
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+      this.scrollTimeout = null;
     }
 
     if (this.resizeObserver) {

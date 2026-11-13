@@ -62,7 +62,7 @@ function initParallax() {
           trigger: parentSection,
           start: 'top bottom',
           end: 'bottom top',
-          scrub: 0.5
+          scrub: true
         }
       });
     } else {
@@ -73,7 +73,7 @@ function initParallax() {
           trigger: parentSection,
           start: 'top bottom',
           end: 'bottom top',
-          scrub: 0.5
+          scrub: true
         }
       });
     }
@@ -120,11 +120,20 @@ export function initSkillsTilt() {
     if (!container) return;
 
     let rafId = null;
+    let cachedRect = null;
+
+    const handleMouseEnter = () => {
+      cachedRect = item.getBoundingClientRect();
+    };
 
     const handleMouseMove = (e) => {
+      if (!cachedRect) {
+        cachedRect = item.getBoundingClientRect();
+      }
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const rect = item.getBoundingClientRect();
+        if (!cachedRect) return;
+        const rect = cachedRect;
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         const normX = (e.clientX - centerX) / (rect.width / 2);
@@ -143,11 +152,13 @@ export function initSkillsTilt() {
     };
 
     const handleMouseLeave = () => {
+      cachedRect = null;
       if (rafId) cancelAnimationFrame(rafId);
       container.style.removeProperty('--tilt-x');
       container.style.removeProperty('--tilt-y');
     };
 
+    item.addEventListener('mouseenter', handleMouseEnter, { passive: true });
     item.addEventListener('mousemove', handleMouseMove, { passive: true });
     item.addEventListener('mouseleave', handleMouseLeave, { passive: true });
   });

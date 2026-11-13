@@ -55,12 +55,31 @@ export class ThemeRope {
     this.isAutoPulling = false;
     this.autoPullProgress = 0;
 
+    // Loop & Caching state
+    this.isRunning = false;
+    this.animId = null;
+    this.cachedContainerRect = null;
+    this.updateContainerRect();
+
     // Theme state (Default: light as requested)
     const storedTheme = localStorage.getItem('dinesh_portfolio_theme');
     this.theme = storedTheme === 'dark' ? 'dark' : 'light';
     this.applyTheme(this.theme, false);
 
     this.initEvents();
+    // Initial paint and settle to sleep
+    this.draw();
+  }
+
+  updateContainerRect() {
+    if (this.container) {
+      this.cachedContainerRect = this.container.getBoundingClientRect();
+    }
+  }
+
+  wake() {
+    if (this.isRunning) return;
+    this.isRunning = true;
     this.startLoop();
   }
 
@@ -89,11 +108,25 @@ export class ThemeRope {
   }
 
   initEvents() {
-    // Mouse hover detection for rope sway
+    // Mouse hover detection for rope sway (guarded by screen area check)
     window.addEventListener('mousemove', (e) => {
-      const rect = this.container.getBoundingClientRect();
-      this.mouseX = e.clientX - rect.left;
-      this.mouseY = e.clientY - rect.top;
+      // Early exit if cursor is nowhere near the top-right ceiling rope area
+      if (e.clientY > 360 || e.clientX < window.innerWidth - 220) {
+        if (this.mouseX !== -9999) {
+          this.mouseX = -9999;
+          this.mouseY = -9999;
+        }
+        return;
+      }
+
+      if (!this.cachedContainerRect) {
+        this.updateContainerRect();
+      }
+      if (this.cachedContainerRect) {
+        this.mouseX = e.clientX - this.cachedContainerRect.left;
+        this.mouseY = e.clientY - this.cachedContainerRect.top;
+        this.wake();
+      }
     }, { passive: true });
 
     window.addEventListener('mouseleave', () => {
@@ -109,6 +142,7 @@ export class ThemeRope {
       this.dragStartY = e.clientY;
       this.hitbox.classList.add('is-dragging');
       this.hitbox.setPointerCapture?.(e.pointerId);
+      this.wake();
       e.preventDefault();
     };
 
@@ -130,6 +164,7 @@ export class ThemeRope {
         // Little visual kick
         this.vy += 6;
       }
+      this.wake();
     };
 
     const onPointerUp = (e) => {
@@ -148,6 +183,7 @@ export class ThemeRope {
         // Elastic snap back
         this.targetHy = this.anchorY + this.restLength;
         this.targetHx = this.anchorX;
+        this.wake();
       }
     };
 
@@ -166,6 +202,11 @@ export class ThemeRope {
 
     window.addEventListener('resize', () => {
       this.pullThreshold = window.innerWidth < 768 ? 34 : 52;
+      this.updateContainerRect();
+    }, { passive: true });
+
+    window.addEventListener('scroll', () => {
+      this.updateContainerRect();
     }, { passive: true });
   }
 
@@ -176,15 +217,25 @@ export class ThemeRope {
     this.toggleTheme();
     // Kick downward impulse
     this.vy = window.innerWidth < 768 ? 16 : 22;
+    this.wake();
   }
 
   startLoop() {
+    if (this.animId) cancelAnimationFrame(this.animId);
+
     const loop = () => {
-      this.updatePhysics();
+      const isStillMoving = this.updatePhysics();
       this.draw();
-      requestAnimationFrame(loop);
+
+      const isHovering = this.mouseY >= 0 && this.mouseY <= this.height + 40 && Math.abs(this.mouseX - this.anchorX) < 90;
+      if (isStillMoving || this.isDragging || this.isAutoPulling || isHovering) {
+        this.animId = requestAnimationFrame(loop);
+      } else {
+        this.isRunning = false;
+        this.animId = null;
+      }
     };
-    requestAnimationFrame(loop);
+    this.animId = requestAnimationFrame(loop);
   }
 
   updatePhysics() {
@@ -220,6 +271,23 @@ export class ThemeRope {
     if (this.hitbox) {
       this.hitbox.style.transform = `translate(-50%, -50%) translate(${this.hx - this.anchorX}px, ${this.hy - 185}px)`;
     }
+
+    // Check if motion has settled to rest
+    const isMoving = Math.abs(this.vx) > 0.04 ||
+                     Math.abs(this.vy) > 0.04 ||
+                     Math.abs(this.hx - this.targetHx) > 0.08 ||
+                     Math.abs(this.hy - this.targetHy) > 0.08;
+
+    if (!isMoving && !this.isDragging && Math.abs(this.hoverInfluenceX) < 0.05) {
+      this.hx = this.targetHx;
+      this.hy = this.targetHy;
+      this.vx = 0;
+      this.vy = 0;
+      if (this.isAutoPulling) this.isAutoPulling = false;
+      return false; // Settled to sleep
+    }
+
+    return true; // Still in motion
   }
 
   draw() {

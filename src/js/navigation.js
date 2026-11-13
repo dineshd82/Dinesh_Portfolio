@@ -1,8 +1,9 @@
 /**
  * Navigation module: Header, Fullscreen Menu, Sticky state, Scroll-to-top, and Anchor scrolling
  */
-import { $, $$, throttle } from './utils.js';
+import { $, $$ } from './utils.js';
 import { scrollTo } from './smoothScroll.js';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function initNavigation() {
   const header = $('.header');
@@ -128,23 +129,20 @@ export function initNavigation() {
     });
   }
 
-  // Throttled scroll listener for scroll-top visibility
-  const onScroll = throttle(() => {
-    const scrollY = window.scrollY || window.pageYOffset;
-
-    // Scroll-to-top button visibility
-    if (scrollTopBtn) {
-      if (scrollY > 200) {
-        scrollTopBtn.classList.remove('not-visible');
-        scrollTopBtn.classList.add('visible');
-      } else {
-        scrollTopBtn.classList.remove('visible');
-        scrollTopBtn.classList.add('not-visible');
+  // Synchronized scroll-to-top button visibility via ScrollTrigger
+  if (scrollTopBtn) {
+    ScrollTrigger.create({
+      start: 'top -200px',
+      onToggle: (self) => {
+        if (self.isActive) {
+          scrollTopBtn.classList.remove('not-visible');
+          scrollTopBtn.classList.add('visible');
+        } else {
+          scrollTopBtn.classList.remove('visible');
+          scrollTopBtn.classList.add('not-visible');
+        }
       }
-    }
-  }, 50);
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll(); // Initial check
+    });
+  }
 }
 

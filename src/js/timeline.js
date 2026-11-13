@@ -232,32 +232,34 @@ export function initExperienceEducationTimeline() {
     }
   }
 
-  // 6. ScrollTrigger Section Position Tracking
-  // Evaluates every frame to guarantee 100% synchrony even on rapid scrolling
-  ScrollTrigger.create({
-    trigger: section,
-    start: 'top bottom',
-    end: 'bottom top',
-    onUpdate: () => {
-      const triggerThreshold = window.innerHeight * 0.52;
-      let targetIdx = 0;
-
-      for (let i = 0; i < entries.length; i++) {
-        const rect = entries[i].getBoundingClientRect();
-        if (rect.top <= triggerThreshold) {
-          targetIdx = i;
+  // 6. High-Performance ScrollTrigger Milestone Position Tracking
+  // Pre-computes and caches scroll offsets on refresh — zero layout reads during scrolling
+  entries.forEach((entry, idx) => {
+    ScrollTrigger.create({
+      trigger: entry,
+      start: 'top 52%',
+      onEnter: () => setActiveMilestone(idx, 1),
+      onLeaveBack: () => {
+        if (idx > 0) {
+          setActiveMilestone(idx - 1, -1);
+        } else {
+          setActiveMilestone(0, -1);
         }
       }
-
-      if (targetIdx !== currentIndex) {
-        const dir = targetIdx > currentIndex ? 1 : -1;
-        setActiveMilestone(targetIdx, dir);
-      }
-    }
+    });
   });
 
-  // Re-check on refresh to ensure alignment
+  // Re-check on refresh to ensure spine alignment and correct milestone selection
   ScrollTrigger.addEventListener('refresh', () => {
     updateSpineBounds();
+    const triggerThreshold = window.innerHeight * 0.52;
+    let targetIdx = 0;
+    for (let i = 0; i < entries.length; i++) {
+      const rect = entries[i].getBoundingClientRect();
+      if (rect.top <= triggerThreshold) {
+        targetIdx = i;
+      }
+    }
+    setActiveMilestone(targetIdx, 0);
   });
 }
