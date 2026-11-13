@@ -2034,38 +2034,38 @@ export class HeroScene {
       this.layout.baseY = -0.26;
       this.layout.scale = 0.38;
     } else {
-      // Mobile (< 768px): Anchored cleanly below hero typography in lower half with guaranteed clearance
+      // Mobile (< 768px): 3D workstation scene positioned in upper half above text content
       if (aspect > 1.2 && height < 550) {
         // Mobile Landscape: side-by-side layout (3D on right, text on left)
         this.layout.baseX = 0.62;
         this.layout.baseY = -0.16;
         this.layout.scale = 0.36;
       } else {
-        // Mobile Portrait: 3D scene comfortably anchored in lower half, guaranteed clearance below typography
-        let mobileScale = 0.38;
-        let mobileY = -0.86;
-        let mobileX = -0.08;
+        // Mobile Portrait: 3D scene placed in upper half (above hero text content)
+        let mobileScale = 0.36;
+        let mobileY = 0.78;
+        let mobileX = -0.06;
 
         if (height < 700) {
-          // Compact / shorter screens (e.g. iPhone SE / older Android devices)
-          mobileScale = 0.34;
-          mobileY = -0.92;
-          mobileX = -0.06;
+          // Compact screens (e.g. iPhone SE / 667h)
+          mobileScale = 0.31;
+          mobileY = 0.82;
+          mobileX = -0.05;
         } else if (height < 800) {
           // Mid-height phones (e.g. 360x740, 390x780)
-          mobileScale = 0.37;
-          mobileY = -0.88;
-          mobileX = -0.08;
+          mobileScale = 0.33;
+          mobileY = 0.80;
+          mobileX = -0.06;
         } else if (height < 880) {
-          // Standard modern smartphones (e.g. iPhone 13/14/15, 390x844, Galaxy 392x824)
-          mobileScale = 0.40;
-          mobileY = -0.84;
-          mobileX = -0.08;
+          // Standard modern smartphones (e.g. iPhone 13/14/15 844h, Galaxy 824h)
+          mobileScale = 0.36;
+          mobileY = 0.78;
+          mobileX = -0.06;
         } else {
-          // Tall phones & phablets (e.g. Pixel 7/8 915px, iPhone Pro Max 932px)
-          mobileScale = 0.42;
-          mobileY = -0.80;
-          mobileX = -0.08;
+          // Tall phones & phablets (e.g. Pixel 7/8 915h, iPhone Pro Max 932h)
+          mobileScale = 0.37;
+          mobileY = 0.78;
+          mobileX = -0.06;
         }
 
         this.layout.baseX = mobileX;
@@ -2081,8 +2081,8 @@ export class HeroScene {
     if (this.floatingCards && this.floatingCards.length > 0) {
       this.floatingCards.forEach((card, idx) => {
         if (width < 768) {
-          // On mobile, show top 2 cards when height allows, or hide on very compact screens to avoid clutter
-          card.mesh.visible = height >= 680 ? idx < 2 : false;
+          // On mobile, show top 2 cards when height allows, or hide on compact screens to keep top clean
+          card.mesh.visible = height >= 720 ? idx < 2 : false;
         } else {
           card.mesh.visible = true;
         }

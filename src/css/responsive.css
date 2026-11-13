@@ -597,8 +597,8 @@
         min-height: 100vh;
         min-height: 100svh;
         justify-content: flex-start;
-        padding-top: clamp(95px, 13vh, 115px);
-        padding-bottom: 24px;
+        padding-top: clamp(340px, 52vh, 495px);
+        padding-bottom: 30px;
     }
     .hero-section .hero-image-wrapper {
         display: none;
@@ -610,7 +610,7 @@
         padding: 0 16px;
     }
     .hero-section .hero-content h1 {
-        font-size: clamp(30px, 7.2vw, 40px);
+        font-size: clamp(28px, 7vw, 38px);
         line-height: 1.15;
         background: none;
         margin-left: 0;
@@ -619,7 +619,7 @@
         overflow-wrap: break-word;
     }
     .hero-section .hero-content h2 {
-        font-size: clamp(16px, 4vw, 21px);
+        font-size: clamp(15.5px, 3.8vw, 20px);
         line-height: 1.35;
         margin-top: 10px;
         margin-left: auto;
@@ -627,7 +627,7 @@
         max-width: 480px;
     }
     .hero-section .hero-content .hero-tagline {
-        font-size: clamp(13.5px, 3.4vw, 15.5px);
+        font-size: clamp(13px, 3.2vw, 15px);
         line-height: 1.5;
         margin-top: 10px;
         margin-left: auto;
@@ -642,7 +642,7 @@
     .hero-section .vertical-logo {
         width: 130px;
         left: 50%;
-        top: clamp(130px, 17vh, 160px);
+        top: clamp(380px, 57vh, 520px);
         transform: translate(-50%, -50%);
     }
     .hero-section .hero-image {
@@ -823,8 +823,8 @@
     .hero-section .content-wrapper {
         min-height: 100vh;
         min-height: 100svh;
-        padding-top: clamp(88px, 12vh, 105px);
-        padding-bottom: 20px;
+        padding-top: clamp(335px, 51vh, 485px);
+        padding-bottom: 25px;
     }
     .hero-section .hero-image-wrapper {
         display: none;
@@ -863,7 +863,7 @@
     .hero-section .vertical-logo {
         width: 120px;
         left: 50%;
-        top: clamp(120px, 16vh, 145px);
+        top: clamp(370px, 56vh, 500px);
         transform: translate(-50%, -50%);
     }
     .hero-section .hero-content h2 {
@@ -1087,7 +1087,7 @@
         padding: 24px 14px 0;
     }
     .hero-section .content-wrapper {
-        padding-top: clamp(78px, 11vh, 92px);
+        padding-top: clamp(320px, 50vh, 360px);
     }
     .hero-section .hero-content h1 {
         font-size: 25px;
@@ -1106,6 +1106,6 @@
     }
     .hero-section .vertical-logo {
         width: 105px;
-        top: clamp(110px, 15vh, 130px);
+        top: clamp(350px, 54vh, 390px);
     }
 }
