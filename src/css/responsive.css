@@ -597,7 +597,7 @@
         min-height: 100vh;
         min-height: 100svh;
         justify-content: flex-start;
-        padding-top: clamp(165px, 21vh, 185px);
+        padding-top: clamp(350px, 100vh, 320px);
         padding-bottom: 40px;
     }
     .hero-section .hero-image-wrapper {
@@ -822,7 +822,7 @@
     .hero-section .content-wrapper {
         min-height: 100vh;
         min-height: 100svh;
-        padding-top: clamp(160px, 21vh, 180px);
+        padding-top: clamp(195px, 25vh, 225px);
         padding-bottom: 30px;
     }
     .hero-section .hero-image-wrapper {
@@ -1085,7 +1085,7 @@
         padding: 24px 14px 0;
     }
     .hero-section .content-wrapper {
-        padding-top: clamp(140px, 20vh, 155px);
+        padding-top: clamp(165px, 23vh, 185px);
     }
     .hero-section .hero-content h1 {
         font-size: 26px;

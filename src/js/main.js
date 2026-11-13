@@ -27,9 +27,17 @@ function dismissPreloader() {
     document.body.classList.remove('is-loading');
     setTimeout(() => {
       preloader.remove();
+      if (window.lenis) {
+        window.lenis.resize();
+      }
+      ScrollTrigger.refresh();
     }, 400);
   } else {
     document.body.classList.remove('is-loading');
+    if (window.lenis) {
+      window.lenis.resize();
+    }
+    ScrollTrigger.refresh();
   }
 }
 
@@ -146,6 +154,9 @@ function initApp() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       dismissPreloader();
+      if (window.lenis) {
+        window.lenis.resize();
+      }
       ScrollTrigger.refresh();
       if (window.location.hash) {
         setTimeout(() => {
@@ -161,6 +172,14 @@ function initApp() {
       }
     });
   });
+
+  // Re-calculate layout dimensions after all assets/images/fonts are completely loaded
+  window.addEventListener('load', () => {
+    if (window.lenis) {
+      window.lenis.resize();
+    }
+    ScrollTrigger.refresh();
+  }, { once: true });
 }
 
 if (document.readyState === 'loading') {

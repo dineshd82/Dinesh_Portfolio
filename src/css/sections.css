@@ -2222,6 +2222,8 @@ button.project-modal-close:hover,
 .instagram-section .single-col img {
   margin-bottom: 20px;
   width: 100%;
+  height: auto;
+  display: block;
   filter: grayscale(100%);
   transition: all 0.5s ease;
 }

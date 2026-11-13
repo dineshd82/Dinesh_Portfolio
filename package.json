@@ -17,6 +17,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "knip": "^6.45.1",
     "vite": "^8.3.5"
   }
 }

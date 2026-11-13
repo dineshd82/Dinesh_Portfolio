@@ -9,15 +9,24 @@
  * - Dedicated scroll locking and restoration without page jump
  */
 
-// Project 1 Images (Oranzone User App)
-import oranzoneShowcaseImg from '../assets/images/oranzone-showcase-opt.jpg';
-import oranzoneDeskImg from '../assets/images/oranzone-desk-opt.jpg';
-import oranzoneHandImg from '../assets/images/project1-opt.jpg';
+// Project 1 Images (Oranzone User App - All 6 Screens)
+import user1Img from '../assets/images/user1.png';
+import user2Img from '../assets/images/user2.png';
+import user3Img from '../assets/images/user3.png';
+import user4Img from '../assets/images/user4.png';
+import user5Img from '../assets/images/user5.png';
+import user6Img from '../assets/images/user6.png';
 
-// Project 2 Images (Ride Booking & Parcel Delivery)
-import ride1Img from '../assets/images/ride1-opt.jpg';
-import ride2Img from '../assets/images/ride2-opt.jpg';
-import ride3Img from '../assets/images/ride3-opt.jpg';
+// Project 2 Images (Ride Booking & Parcel Delivery - All 9 Screens)
+import rideApp1Img from '../assets/images/ride app1.png';
+import rideApp2Img from '../assets/images/ride app2.png';
+import rideApp3Img from '../assets/images/ride app3.png';
+import rideApp4Img from '../assets/images/ride app4.png';
+import rideApp5Img from '../assets/images/ride app5.png';
+import rideApp6Img from '../assets/images/ride app6.png';
+import rideApp7Img from '../assets/images/ride app7.png';
+import rideApp8Img from '../assets/images/ride app8.png';
+import rideApp9Img from '../assets/images/ride app9.png';
 
 // Project 3 Images (Oranzone Support App - All 7 Screens)
 import support1Img from '../assets/images/support1.png';
@@ -52,36 +61,51 @@ export const projectsData = [
     },
     slideshowImages: [
       {
-        src: oranzoneShowcaseImg,
-        alt: 'Oranzone User App Multi-Screen Showcase',
-        caption: 'Core Mobile Showcase — Home, Service Catalog, Ride Booking & Live Driver Telemetry'
+        src: user1Img,
+        alt: 'Oranzone User App In-Flight Service Discovery',
+        caption: 'In-Flight Commute Experience — On-Demand Mobile Discovery & Service Booking on the Go'
       },
       {
-        src: oranzoneDeskImg,
-        alt: 'Oranzone Popular Services and Discovery Screen',
-        caption: 'Discovery & Services Catalog — Category Browsing, Assistants & Event Exploration'
+        src: user2Img,
+        alt: 'Oranzone User App Vehicle Selection & Checkout',
+        caption: 'Vehicle Tier Selection & Checkout — Flexible Ride Classes (Bike, Mini, Sedan) with Instant Coupon Validation'
       },
       {
-        src: oranzoneHandImg,
-        alt: 'Oranzone User App Onboarding and Brand Splash',
-        caption: 'High-Fidelity Mobile App Launch — Brand Onboarding & Splash Experience'
+        src: user4Img,
+        alt: 'Oranzone Brand Splash Screen Experience',
+        caption: 'Oranzone Brand Splash Experience — "Real people, Real moments, Real journey!" Brand Identity'
       }
     ],
     images: [
       {
-        src: oranzoneShowcaseImg,
-        alt: 'Oranzone User App Multi-Screen Showcase',
-        caption: 'Core Mobile Showcase — Home, Service Catalog, Ride Booking & Live Driver Telemetry'
+        src: user1Img,
+        alt: 'user1.png — In-Flight Mobile Service Discovery',
+        caption: 'In-Flight Commute Experience — On-Demand Mobile Discovery & Service Booking on the Go'
       },
       {
-        src: oranzoneDeskImg,
-        alt: 'Oranzone Popular Services and Discovery Screen',
-        caption: 'Discovery & Services Catalog — Category Browsing, Assistants & Event Exploration'
+        src: user2Img,
+        alt: 'user2.png — Vehicle Selection & Secure Checkout',
+        caption: 'Vehicle Tier Selection & Checkout — Flexible Ride Classes (Bike, Mini, Sedan) with Instant Coupon Validation'
       },
       {
-        src: oranzoneHandImg,
-        alt: 'Oranzone User App Onboarding and Brand Splash',
-        caption: 'High-Fidelity Mobile App Launch — Brand Onboarding & Splash Experience'
+        src: user3Img,
+        alt: 'user3.png — Oranzone Brand Splash Screen',
+        caption: 'Oranzone Brand Splash Experience — "Real people, Real moments, Real journey!" Brand Identity'
+      },
+      {
+        src: user4Img,
+        alt: 'user4.png — Popular Services & Errand Discovery',
+        caption: 'Desk Lifestyle & Service Hub — Category Exploration for Assistants, Events & Journey Partners'
+      },
+      {
+        src: user5Img,
+        alt: 'user5.png — Vehicle Configuration & Live Driver Tracking',
+        caption: 'Ride Configuration & Live Tracking — Duration Estimates, Driver Telemetry & Interactive Route Progress'
+      },
+      {
+        src: user6Img,
+        alt: 'user6.png — Bookings & Rides Management Hub',
+        caption: 'Activity Management Hub — Comprehensive History of Upcoming Events, Social Meetups & Completed Rides'
       }
     ],
     caseStudy: {
@@ -115,36 +139,66 @@ export const projectsData = [
     },
     slideshowImages: [
       {
-        src: ride1Img,
-        alt: 'Ride Booking Tier Selection & Driver Telemetry',
-        caption: 'Vehicle Tier Selection & Driver Dispatch — Sedan, Auto, Bike Classes & Live OTP Telemetry'
+        src: rideApp1Img,
+        alt: 'Ride Booking Live GPS Tracking & Driver Telemetry',
+        caption: 'Live GPS Tracking & Telemetry — Secure OTP Handshake, Real-Time Driver Telemetry & Turn-by-Turn Route'
       },
       {
-        src: ride2Img,
-        alt: 'Ride Booking Route Optimization & Live GPS Tracking',
-        caption: 'Trip Configuration & Live Telemetry — Vehicle Selection, Promo Coupons & Real-Time Driver Tracking'
+        src: rideApp2Img,
+        alt: 'Multimodal Booking & Destination Discovery',
+        caption: 'Multimodal Booking & Destination Discovery — Single-Tap Ride or Parcel Toggle with Saved Places'
       },
       {
-        src: ride3Img,
-        alt: 'Ride Booking Trips History & Bookings Management',
-        caption: 'Bookings Management & History — Completed Rides, Driver Profiles & Trip Summaries'
+        src: rideApp3Img,
+        alt: 'Vehicle Tier Selection & Fare Transparency',
+        caption: 'Vehicle Tier Selection & Fare Transparency — Bike Taxi, Auto Rickshaw, Car Sedan & Upfront Pricing'
       }
     ],
     images: [
       {
-        src: ride1Img,
-        alt: 'Ride Booking Tier Selection & Driver Telemetry',
-        caption: 'Vehicle Tier Selection & Driver Dispatch — Sedan, Auto, Bike Classes & Live OTP Telemetry'
+        src: rideApp1Img,
+        alt: 'ride app1.png — Vehicle Tier Selection & Upfront Fare',
+        caption: 'Vehicle Tier Selection & Upfront Fare — Bike Taxi, Auto Rickshaw & Car Sedan with Live Fare Estimation'
       },
       {
-        src: ride2Img,
-        alt: 'Ride Booking Route Optimization & Live GPS Tracking',
-        caption: 'Trip Configuration & Live Telemetry — Vehicle Selection, Promo Coupons & Real-Time Driver Tracking'
+        src: rideApp2Img,
+        alt: 'ride app2.png — Ride & Parcel Bookings History',
+        caption: 'Bookings & Activity History — Comprehensive Ride & Parcel Log with Driver Profiles & Receipt Breakdown'
       },
       {
-        src: ride3Img,
-        alt: 'Ride Booking Trips History & Bookings Management',
-        caption: 'Bookings Management & History — Completed Rides, Driver Profiles & Trip Summaries'
+        src: rideApp3Img,
+        alt: 'ride app3.png — Brand Splash & Urban Identity',
+        caption: 'Brand Splash Experience — Minimalist Metropolitan Skyline & Express Onboarding Flow'
+      },
+      {
+        src: rideApp4Img,
+        alt: 'ride app4.png — Live GPS Tracking & Driver Telemetry',
+        caption: 'Live Telemetry & Driver Dispatch — OTP Handshake, Real-Time Map Tracking & Direct Driver Communication'
+      },
+      {
+        src: rideApp5Img,
+        alt: 'ride app5.png — Ride Completion & Driver Tipping',
+        caption: 'Trip Completion & Recognition — Instant Settlement, Upfront Fare Receipt & Driver Tipping Interface'
+      },
+      {
+        src: rideApp6Img,
+        alt: 'ride app6.png — Parcel Delivery & OTP Handover',
+        caption: 'Logistics Handover Verification — Recipient Verification, Digital Secure OTP & Delivery Route Log'
+      },
+      {
+        src: rideApp7Img,
+        alt: 'ride app7.png — Veyra In-App Wallet & UPI Checkout',
+        caption: 'Digital Payments & In-App Wallet — 1-Tap UPI Checkout (GPay, PhonePe, Paytm) & FastPass Balance'
+      },
+      {
+        src: rideApp8Img,
+        alt: 'ride app8.png — Booking & Address Configuration',
+        caption: 'Multimodal Booking Interface — Dual Ride & Parcel Modes with Saved Places & Live Geocoding'
+      },
+      {
+        src: rideApp9Img,
+        alt: 'ride app9.png — Safety Centre & Emergency Protocol',
+        caption: 'Commuter Safety Centre — 24/7 Guardian Telematics, Instant SOS 112 Dispatch & Trusted Contact Sharing'
       }
     ],
     caseStudy: {
@@ -340,8 +394,8 @@ export function initSelectedWork() {
     }
   }
 
-  // Pre-initialize a persistent pool of 3 slides (exactly 3 images per project slideshow)
-  const MAX_SLIDES = 3;
+  // Pre-initialize a persistent pool of slides
+  const MAX_SLIDES = Math.max(...projectsData.map(p => (p.slideshowImages || p.images.slice(0, 3)).length), 3);
   slidesWrapper.innerHTML = '';
   const slidePool = [];
 
@@ -436,6 +490,12 @@ export function initSelectedWork() {
     // 4. Reset and restart auto-cycling if active
     if (isSectionVisible && !isHovered && !isModalOpen) {
       startAutoCycle();
+    }
+
+    // 5. Refresh smooth scroll layout boundaries
+    const lenis = getLenis();
+    if (lenis) {
+      lenis.resize();
     }
   }
 
@@ -650,6 +710,7 @@ export function initSelectedWork() {
     // 4. Resume Lenis smooth scroll
     if (lenis && typeof lenis.start === 'function') {
       lenis.start();
+      lenis.resize();
     }
 
     // 5. Resume auto-cycling if section is visible

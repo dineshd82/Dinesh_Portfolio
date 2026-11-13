@@ -4,9 +4,19 @@
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { prefersReducedMotion } from './utils.js';
+import { prefersReducedMotion, debounce } from './utils.js';
 
 let lenisInstance = null;
+
+/**
+ * Re-calculate layout dimensions for both Lenis and ScrollTrigger
+ */
+export function refreshScrollDimensions() {
+  if (lenisInstance) {
+    lenisInstance.resize();
+  }
+  ScrollTrigger.refresh();
+}
 
 /**
  * Initialize Lenis smooth scrolling
@@ -26,11 +36,28 @@ export function initSmoothScroll() {
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
-      infinite: false
+      infinite: false,
+      autoResize: true
     });
 
-    // Synchronize Lenis with GSAP ScrollTrigger
-    lenisInstance.on('scroll', ScrollTrigger.update);
+    // Debounced dimension refresh to avoid layout thrashing while guaranteeing accuracy
+    const debouncedRefresh = debounce(() => {
+      refreshScrollDimensions();
+    }, 60);
+
+    // Synchronize Lenis with GSAP ScrollTrigger and auto-detect dynamic page height changes
+    lenisInstance.on('scroll', (e) => {
+      ScrollTrigger.update();
+
+      // If document scrollHeight expanded (e.g. lazy images or dynamic content) without Lenis noticing,
+      // update immediately so scrolling is never prematurely blocked
+      const currentScrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      const recordedScrollHeight = lenisInstance.dimensions?.scrollHeight || 0;
+      if (Math.abs(currentScrollHeight - recordedScrollHeight) > 10) {
+        lenisInstance.resize();
+        ScrollTrigger.refresh();
+      }
+    });
 
     gsap.ticker.add((time) => {
       lenisInstance?.raf(time * 1000);
@@ -39,6 +66,47 @@ export function initSmoothScroll() {
     gsap.ticker.lagSmoothing(0);
 
     window.lenis = lenisInstance;
+
+    // 1. Observe document.body size changes with ResizeObserver
+    if (typeof ResizeObserver !== 'undefined' && document.body) {
+      const resizeObserver = new ResizeObserver(() => {
+        debouncedRefresh();
+      });
+      resizeObserver.observe(document.body);
+    }
+
+    // 2. Observe DOM mutations (dynamically injected cards, slides, modals)
+    if (typeof MutationObserver !== 'undefined' && document.body) {
+      const mutationObserver = new MutationObserver(() => {
+        debouncedRefresh();
+      });
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // 3. Attach load/error listeners to all <img> tags (lazy-loaded images expand document height)
+    const monitorImageLoads = () => {
+      const images = document.querySelectorAll('img');
+      images.forEach((img) => {
+        if (!img.complete) {
+          img.addEventListener('load', () => debouncedRefresh(), { once: true });
+          img.addEventListener('error', () => debouncedRefresh(), { once: true });
+        }
+      });
+    };
+    monitorImageLoads();
+
+    // Re-check for newly added images periodically or after window load
+    window.addEventListener('load', () => {
+      monitorImageLoads();
+      refreshScrollDimensions();
+    }, { once: true });
+
+    // 4. Update when custom fonts finish loading
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        debouncedRefresh();
+      });
+    }
 
     return lenisInstance;
   } catch (error) {
