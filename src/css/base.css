@@ -1,0 +1,214 @@
+/* Base Styles & Typography */
+@font-face {
+  font-family: 'Futura Bk BT';
+  src: url('../assets/fonts/FuturaBT-Book.woff2') format('woff2'),
+       url('../assets/fonts/FuturaBT-Book.woff') format('woff'),
+       url('../assets/fonts/FuturaBT-Book.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura Md BT';
+  src: url('../assets/fonts/FuturaBT-Medium.woff2') format('woff2'),
+       url('../assets/fonts/FuturaBT-Medium.woff') format('woff'),
+       url('../assets/fonts/FuturaBT-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura Md BT';
+  src: url('../assets/fonts/FuturaBT-Bold.woff2') format('woff2'),
+       url('../assets/fonts/FuturaBT-Bold.woff') format('woff'),
+       url('../assets/fonts/FuturaBT-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  font-size: 22px;
+  line-height: 1.8;
+  color: var(--theme-text-secondary);
+  background-color: var(--theme-bg-body);
+  font-family: var(--font-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background-color var(--transition-theme), color var(--transition-theme);
+}
+
+body.is-loading {
+  overflow: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: normal;
+  color: var(--color-text-primary);
+  -webkit-font-variant-ligatures: common-ligatures;
+  font-variant-ligatures: common-ligatures;
+}
+
+h1 {
+  font-size: clamp(32px, 5vw, 50px);
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1.35;
+}
+
+h3 {
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.4;
+}
+
+h4 {
+  font-size: clamp(20px, 2.5vw, 24px);
+  line-height: 1.4;
+}
+
+h5 {
+  font-size: 18px;
+  line-height: 28px;
+}
+
+h6 {
+  font-size: 16px;
+  line-height: 26px;
+}
+
+p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 22px;
+  line-height: 1.8;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-style: none;
+  vertical-align: middle;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-medium);
+}
+
+a:hover,
+a:focus {
+  text-decoration: none;
+  outline: none;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+address {
+  font-style: normal;
+  line-height: inherit;
+}
+
+/* Form controls */
+input,
+textarea,
+select {
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-primary);
+  font-family: var(--font-primary);
+  font-size: 17px;
+  padding: 10px 15px;
+  width: 100%;
+  margin: 0 0 20px 0;
+  max-width: 100%;
+  resize: none;
+  height: 50px;
+  background: transparent;
+  transition: border-color var(--transition-medium);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+textarea {
+  height: 120px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@media (min-width: 576px) {
+  .container { max-width: 540px; }
+}
+@media (min-width: 768px) {
+  .container { max-width: 720px; }
+}
+@media (min-width: 992px) {
+  .container { max-width: 960px; }
+}
+@media (min-width: 1200px) {
+  .container { max-width: 1140px; }
+}
+@media (min-width: 1400px) {
+  .container { max-width: 1280px; }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
